@@ -7,7 +7,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id: tiki-login.php 51166 2014-05-07 16:00:38Z arildb $
-session_start();
+//session_start();
 $inputConfiguration = array(
 	array( 'staticKeyFilters' => array(
 		'user' => 'text',
@@ -373,12 +373,16 @@ if ($isvalid) {
 			// This happens if the user has just registered and it's first login
 			if ($url == '' || preg_match('/(tiki-register|tiki-login_validate|tiki-login_scr)\.php/', $url)) $url = $prefs['tikiIndex'];
 			// Now if the remember me feature is on and the user checked the rememberme checkbox then ...
+			
 			if ($prefs['rememberme'] != 'disabled' && isset($_REQUEST['rme']) && $_REQUEST['rme'] == 'on') {
 				$userInfo = $userlib->get_user_info($user);
 				$userId = $userInfo['userId'];
 				$secret = $userlib->create_user_cookie($userId);
 				setcookie($user_cookie_site, $secret . '.' . $userId, $tikilib->now + $prefs['remembertime'], $prefs['cookie_path'], $prefs['cookie_domain']);
 				$logslib->add_log('login', 'got a cookie for ' . $prefs['remembertime'] . ' seconds');
+			}
+			if(isset($_REQUEST['page']) && $_REQUEST['page']!='') {
+				$url = 'tiki-index.php?page='.$_REQUEST['page'];
 			}
 		}
 	}
@@ -443,9 +447,9 @@ if ($isvalid) {
 		}
 	}
 	*/
-	//echo $error; exit;
+	//echo $error.$_REQUEST['error']; exit;
 	switch ($error) {
-		case PASSWORD_INCORRECT:
+		/*case PASSWORD_INCORRECT:
 			$error = 'Invalid username or password';
         	$smarty->assign('msg', $error);
 			$smarty->assign('mid', 'tiki-login.tpl');
@@ -480,14 +484,15 @@ if ($isvalid) {
 		case USER_ALREADY_LOGGED:
 			$error = tra('You are already logged in.');
         		break;
-
+		*/
 		default:
-			$error = tra('Invalid username or password');
+			$error = $_REQUEST['error'];//tra('Invalid username or password');
 	}
 	//if (isset($extraButton)) $smarty->assign_by_ref('extraButton', $extraButton);
 	//echo $error; exit;
 	//	Report error "inline" with the login module
 	$error = $_REQUEST['error'];
+	//echo $_REQUEST['error']; exit;
 	$smarty->assign('error_login', $error);
 	$smarty->assign('mid', 'tiki-login.tpl');
 	$smarty->display('tiki.tpl');
