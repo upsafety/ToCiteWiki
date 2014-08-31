@@ -2504,7 +2504,7 @@ class UsersLib extends TikiLib
 				}
 			}
 
-			$body = "<a href='#'>" . $body . '</a>';
+			$body = "<a href='#' style='cursor:default'>" . $body . '</a>';
 			return $body;
 		}
 		return $body;

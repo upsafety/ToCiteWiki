@@ -8,7 +8,7 @@ $encUser = str_replace("\0","",$encUser);
 $userArray = explode(",",$encUser);
 if(count($userArray)==3) {
 	$user = trim($userArray[0]); 
-	$client_code = trim($userArray[1]); 
+	$client_id = trim($userArray[1]); 
 	$last_login = trim($userArray[2]); 
 	if(isset($_REQUEST['page']) && $_REQUEST['page']!='') {
 		$page = $_REQUEST['page'];
@@ -18,7 +18,7 @@ if(count($userArray)==3) {
 	}
 	
 	if(isset($wsdl) && $wsdl!="") {
-		$params = array('UserID'=>$user,'ClientID'=>$client_code,'LastLoggedOn'=>$last_login);
+		$params = array('UserID'=>$user,'ClientID'=>$client_id,'LastLoggedOn'=>$last_login);
 		$my_cert_file = (String)$web_config_xml->children()->cert_file;
 		$client = new SoapClient($wsdl,array('local_cert', $my_cert_file));
 		$json_result = $client->GetLoggedInUserDetails($params);
@@ -37,7 +37,7 @@ if(count($userArray)==3) {
 				$_POST['appuserid'] = $json_obj->{'UserId'};;
 				$_POST['clientid'] = $json_obj->{'ClientId'};;
 				$_POST['clientcode'] = $json_obj->{'ClientCode'};
-				setcookie("client_code", $client_code,time()+1800);
+				setcookie("client_code", $json_obj->{'ClientCode'},time()+1800);
 				if($is_admin) {
 					$_POST['user_type'] = "Admins";
 				}
@@ -94,7 +94,7 @@ else {
 			$attempt = 0;
 			setcookie("attempt", $attempt);
 		}
-		//echo $attempt; exit;
+		//echo $client_code; exit;
 		$params = array('UserName'=>$user,'Password'=>$password,'ClientCode'=>$client_code,'FailedLoginCount'=>$attempt);
 		$my_cert_file = (String)$web_config_xml->children()->cert_file;
 		$client = new SoapClient($wsdl,array('local_cert', $my_cert_file));
